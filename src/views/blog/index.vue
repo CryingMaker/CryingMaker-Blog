@@ -4,7 +4,6 @@
         <Blog />
         <Blog />
         <Blog />
-        <Blog />
     </div>
 </template>
 

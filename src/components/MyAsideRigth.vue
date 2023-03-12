@@ -35,13 +35,15 @@
         </div>
 
         <div class="website-info">
-            <p>备案/许可证: <br> <a href="javasrcipt:#">鄂ICP备xxxxxxx号</a></p>
-            <p>网站备案/许可证: <br> <a href="javasrcipt:#">鄂ICP备xxxxxxx号</a></p>
+            <p><a href="javasrcipt:#">鄂ICP备xxxxxxx号</a></p>
+            <p><a href="javasrcipt:#">鄂ICP备xxxxxxx号</a></p>
         </div>
     </aside>
 </template>
 
 <script lang="ts" setup>
+
+
 
 </script>
 
@@ -96,21 +98,57 @@
 
     .website-info {
         width: 100%;
-        height: 100px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        align-items: flex-start;
+        align-items: center;
         padding: 3px 0px;
         font-size: $size-14;
         margin-top: 10px;
 
-        a {
+        p {
+            padding: 5px 0px;
+
             &:hover {
                 font-weight: 600;
             }
         }
+
+
     }
+}
+
+@media screen and (max-width: 1100px) {
+    .aside {
+        background-color: $gray-1;
+        color: $gray-10 !important;
+        padding: 0;
+
+        .links {
+            .link {
+                color: $gray-10 !important;
+                background-color: $gray-1 !important;
+                justify-content: center;
+
+                span {
+                    padding-left: $size-10 !important;
+                }
+
+                .icon {
+                    font-size: 20px !important;
+                }
+            }
+        }
+
+        .website-info {
+            font-size: $size-14;
+
+            a {
+                color: $gray-10;
+            }
+        }
+    }
+
 
 }
 </style>

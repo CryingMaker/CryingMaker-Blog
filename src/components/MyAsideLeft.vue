@@ -19,7 +19,6 @@
 </template>
 
 <script lang="ts" setup>
-
 const info = [
     {
         title: 'QQ',
@@ -40,17 +39,45 @@ const info = [
 ]
 
 const tags = ['APEX', 'CSGO', '生化危机3', '生化危机2', '古墓丽影:暗影', '古墓丽影:崛起', '消逝的光芒'];
-
-
 </script>
 
 <style lang="scss" scoped>
+@media screen and (max-width: 1100px) {
+
+    .aside {
+        padding: 10px 5px !important;
+        background-color: $gray-1 !important;
+        color: $gray-10 !important;
+        position: relative;
+    }
+
+    .avater {
+        height: 120px !important;
+
+        .avater-img {
+            // border-radius: 0 !important;
+            width: 80px !important;
+            height: 80px !important;
+        }
+
+        .avater-text {
+            height: 20%;
+            font-size: $size-20;
+        }
+    }
+
+    .info,
+    .tags {
+        display: none !important;
+    }
+
+
+}
+
 .aside {
     width: 100%;
     border-radius: 10px;
     background-color: $gray-10;
-    top: 80px;
-    left: 100px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -85,6 +112,13 @@ const tags = ['APEX', 'CSGO', '生化危机3', '生化危机2', '古墓丽影:�
                 height: 100%;
                 object-fit: cover;
             }
+        }
+
+        .avater-text {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            word-break: break-all;
+            white-space: nowrap;
         }
 
 

@@ -19,15 +19,51 @@
 </script>
 
 <style lang="scss" scoped>
+@media screen and (max-width: 1100px) {
+    .item {
+        height: 200px !important;
+    }
+
+    .image {
+        width: 40% !important;
+    }
+
+    .content {
+        width: 60% !important;
+    }
+
+    .content {
+        padding: 0px !important;
+        padding-left: 10px !important;
+
+        .title {
+            font-size: 20px !important;
+        }
+
+        .publish-time {
+            font-size: $size-16 !important;
+        }
+
+        .subtitle {
+            font-size: $size-12 !important;
+        }
+    }
+}
+
 .item {
     background-color: $gray-1;
-    width: 100%;
+    width: 95%;
     height: 300px;
     border-radius: 10px;
-    margin-bottom: 25px;
+    margin: 0 auto;
+    margin-bottom: 50px;
     display: flex;
     justify-content: space-between;
     overflow: hidden;
+
+    &:hover .image {
+        transform: translateX(-20px);
+    }
 
 
     .image,
@@ -40,9 +76,7 @@
         transition: all .2s linear;
         clip-path: polygon(0 0, 88% 0, 100% 100%, 0 100%);
 
-        &:hover {
-            transform: translateX(-20px);
-        }
+
 
         img {
             width: 100%;

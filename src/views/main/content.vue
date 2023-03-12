@@ -76,4 +76,45 @@
         }
     }
 }
+
+@media screen and (max-width: 1350px) {
+    .rigth {
+        display: none;
+    }
+
+    .center {
+        width: 87% !important;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+
+    .main {
+        width: 100%;
+        padding: 0;
+        margin-top: 50px;
+        border-radius: 0px !important;
+
+        .rigth {
+            display: none;
+        }
+
+        .left {
+            display: none;
+        }
+
+        .center {
+            width: 100% !important;
+            margin: 0 !important;
+            border-radius: 0px !important;
+
+            &::-webkit-scrollbar {
+                width: 3px;
+                height: 5px;
+            }
+        }
+    }
+
+
+}
 </style>
