@@ -5,7 +5,7 @@
             <div :class="{ isActive: header.index == index }" @click="handleNav(index, item.path)"
                 v-for="(item, index) in nav" :key="index">{{ item.name }}</div>
         </nav>
-        <div class="theme" @click="trigger()">开关</div>
+        <Theme @click="trigger()" />
 
         <div class="more" @click="handleNavList()">
             <svg class="icon svg-icon" aria-hidden="true">
@@ -22,8 +22,11 @@
                 <div :class="{ isActive: header.index == index }" @click="handleNav(index, item.path)"
                     v-for="(item, index) in nav" :key="index">{{ item.name }}</div>
             </div>
-            <div class="theme" @click="trigger()">开关</div>
-            <!-- <div class="line"></div> -->
+            <div class="theme-box">
+                <div class="center">
+                    <Theme @click="trigger()" />
+                </div>
+            </div>
             <MyAsideRigth />
         </div>
     </transition>
@@ -104,7 +107,6 @@ onMounted(() => {
     transform: translateX(100%);
 }
 
-
 .header {
     width: 100%;
     height: 50px;
@@ -180,15 +182,10 @@ onMounted(() => {
         }
     }
 
-    .theme {
-        cursor: pointer;
-    }
-
     .more {
         display: none;
     }
 }
-
 
 .mask {
     position: fixed;
@@ -211,6 +208,7 @@ onMounted(() => {
     color: $gray-10;
     z-index: 9999;
     overflow-y: auto;
+    overflow-x: none;
     padding: 50px 0px;
 
     .line {
@@ -249,7 +247,7 @@ onMounted(() => {
         }
     }
 
-    .theme {
+    .theme-box {
         height: 50px;
         width: 35%;
         color: $gray-10;
@@ -257,8 +255,14 @@ onMounted(() => {
         position: fixed;
         bottom: 0;
         right: 0px;
-        text-align: center;
         background-color: $gray-1;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+
+        .center {
+            margin: 0 auto;
+        }
     }
 
     &::-webkit-scrollbar {

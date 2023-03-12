@@ -19,5 +19,6 @@ declare module '@vue/runtime-core' {
     MyHeader: typeof import('./components/MyHeader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Theme: typeof import('./components/theme.vue')['default']
   }
 }

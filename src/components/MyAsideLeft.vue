@@ -55,7 +55,6 @@ const tags = ['APEX', 'CSGO', '生化危机3', '生化危机2', '古墓丽影:�
         height: 120px !important;
 
         .avater-img {
-            // border-radius: 0 !important;
             width: 80px !important;
             height: 80px !important;
         }

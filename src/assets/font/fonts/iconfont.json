@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "6805582",
+      "name": "Sun",
+      "font_class": "Sun",
+      "unicode": "e9b6",
+      "unicode_decimal": 59830
+    },
+    {
+      "icon_id": "14341984",
+      "name": "moon",
+      "font_class": "moon",
+      "unicode": "e7bf",
+      "unicode_decimal": 59327
+    },
+    {
       "icon_id": "15681633",
       "name": "更多",
       "font_class": "gengduo1",

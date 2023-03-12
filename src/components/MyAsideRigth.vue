@@ -38,11 +38,36 @@
             <p><a href="javasrcipt:#">鄂ICP备xxxxxxx号</a></p>
             <p><a href="javasrcipt:#">鄂ICP备xxxxxxx号</a></p>
         </div>
+
+        <div class="top" ref="topDOM" @mousemove="gobacktop.setSpeed(1)" @mouseleave="gobacktop.setSpeed(.5)"
+            @click="emit('goBackTop')"></div>
+
     </aside>
 </template>
 
 <script lang="ts" setup>
+import lottie, { AnimationItem, AnimationConfigWithData } from 'lottie-web';
+import goBackTop from '../assets/lottie/goTop.json'
 
+//接收返回顶部事件
+const emit = defineEmits(['goBackTop']);
+
+
+//top元素 和 top动画对象
+let topDOM = ref<Element>();
+let gobacktop: AnimationItem;
+onMounted(() => {
+    const options1: AnimationConfigWithData = {
+        container: <Element>topDOM.value,
+        name: 'gobacktop',
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        animationData: goBackTop,
+    };
+    gobacktop = lottie.loadAnimation(options1)
+    gobacktop.setSpeed(.5)
+})
 
 
 </script>
@@ -60,6 +85,17 @@
     flex-direction: column;
     padding: 20px 15px;
     color: $gray-1;
+
+    .top {
+        width: 100%;
+        height: 100px;
+        margin-top: 20px;
+        transition: all .2s ease-in;
+
+        &:hover {
+            transform: scale(1.05);
+        }
+    }
 
     .links {
         width: 100%;
@@ -127,7 +163,6 @@
         .links {
             .link {
                 color: $gray-10 !important;
-                background-color: $gray-1 !important;
                 justify-content: center;
 
                 span {
@@ -146,6 +181,10 @@
             a {
                 color: $gray-10;
             }
+        }
+
+        .top {
+            display: none;
         }
     }
 

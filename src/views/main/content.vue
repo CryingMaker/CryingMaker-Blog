@@ -3,7 +3,7 @@
         <div class="left">
             <MyAsideLeft />
         </div>
-        <div class="center">
+        <div class="center" ref="main">
             <router-view v-slot="{ Component }">
                 <transition name="main" mode="out-in">
                     <component :is="Component" />
@@ -11,12 +11,24 @@
             </router-view>
         </div>
         <div class="rigth">
-            <MyAsideRigth />
+            <MyAsideRigth @goBackTop="goBackTop" />
         </div>
     </main>
 </template>
  
 <script lang="ts" setup>
+
+let main = ref<Element>();
+
+const goBackTop = () => {
+    const timer = setInterval(() => {
+        if (main.value!.scrollTop <= 0) {
+            clearInterval(timer)
+        } else {
+            main.value?.scrollTo({ left: 0, top: main.value.scrollTop - 50 })
+        }
+    }, 5)
+}
 
 </script>
 
@@ -34,14 +46,13 @@
 
 .main {
     width: 95%;
-    max-height: 870px;
+    height: 93vh;
     border-radius: 10px;
     margin: 80px auto;
     margin-top: 60px;
     margin-bottom: 0px;
     display: flex;
     padding: 10px 20px;
-    overflow: hidden;
 
     .left {
         width: 18%;
@@ -53,7 +64,6 @@
 
     .center {
         width: 72%;
-        min-height: 800px;
         overflow-y: auto;
         margin: 0px 10px;
         border-radius: 10px;
