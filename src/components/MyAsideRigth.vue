@@ -83,7 +83,7 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     flex-direction: column;
-    padding: 20px 15px;
+    padding: 20px 8px;
     color: $gray-1;
 
     .top {

@@ -1,6 +1,6 @@
 <template>
     <header class="header">
-        <div class="logo">CRYINGMAKER</div>
+        <div class="logo">CryingMaker</div>
         <nav class="nav">
             <div :class="{ isActive: header.index == index }" @click="handleNav(index, item.path)"
                 v-for="(item, index) in nav" :key="index">{{ item.name }}</div>
@@ -13,6 +13,7 @@
             </svg>
         </div>
     </header>
+
 
     <transition name="modal" mode="out-in">
         <div class="modal" v-show="header.modal" v-if="clientWidth < 1100">
@@ -38,8 +39,8 @@
 
 <script lang="ts" setup>
 import { useRouter, useRoute } from 'vue-router';
-import { headerStore } from '../store';
-const header = headerStore();
+import { useHeaderStore } from '../store';
+const header = useHeaderStore();
 const router = useRouter();
 const route = useRoute();
 
@@ -57,24 +58,22 @@ const handleNav = (index: number, path: string) => {
     header.setIndex(index);
 }
 
-
 //获取用户屏幕宽度 如果小于800 那么不加载 modal 模块
 let clientWidth = ref<number>(0);
 const getWindowResize = () => {
     clientWidth.value = document.body.clientWidth;
 }
 
-
 //切换主题色
 const trigger = () => {
     if (header.theme) {
         document.getElementsByTagName('body')[0].style.setProperty('--gray-1', '#202020');
         document.getElementsByTagName('body')[0].style.setProperty('--gray-10', '#FFFFFF');
-        header.theme = 0;
+        header.theme = false;
     } else {
         document.getElementsByTagName('body')[0].style.setProperty('--gray-1', '#FFFFFF');
         document.getElementsByTagName('body')[0].style.setProperty('--gray-10', '#202020');
-        header.theme = 1;
+        header.theme = true;
     }
 }
 
@@ -82,7 +81,6 @@ const trigger = () => {
 const handleNavList = () => {
     header.triggerModal();
 }
-
 
 onMounted(() => {
     //当用户刷新时 从路由的meta中获取当前的navIndex
@@ -135,8 +133,8 @@ onMounted(() => {
             transform: scale(1.2);
 
             &::before {
-                left: 60%;
-                top: 60%;
+                left: 65%;
+                top: 65%;
             }
         }
 
@@ -144,11 +142,12 @@ onMounted(() => {
             content: '';
             display: block;
             position: absolute;
-            left: -60%;
-            top: -60%;
+            left: -65%;
+            top: -65%;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, .5);
+            background-color: $gray-10;
+            opacity: .3;
             transform: rotate(-45deg);
             z-index: 999;
             transition: all .5s linear;
@@ -169,7 +168,6 @@ onMounted(() => {
             background-color: $gray-10;
             color: $gray-1;
             border-radius: 30px;
-            padding: 5px 20px;
         }
 
         div {
@@ -251,7 +249,6 @@ onMounted(() => {
         height: 50px;
         width: 35%;
         color: $gray-10;
-        cursor: pointer;
         position: fixed;
         bottom: 0;
         right: 0px;

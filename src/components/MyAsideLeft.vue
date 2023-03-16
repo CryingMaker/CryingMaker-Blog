@@ -15,10 +15,27 @@
                 <div v-for="(item, index) in tags" :key="item">{{ item }}</div>
             </div>
         </div>
+
+        <div class="nums">
+            <div>
+                <p class="subtitle">文章</p>
+                <p class="total">{{ article }}</p>
+            </div>
+            <div>
+                <p class="subtitle">留言</p>
+                <p class="total">{{ message }}</p>
+            </div>
+            <div>
+                <p class="subtitle">照片</p>
+                <p class="total">{{ photo }}</p>
+            </div>
+        </div>
     </aside>
 </template>
 
 <script lang="ts" setup>
+import { getMessageCount } from '../api/message';
+
 const info = [
     {
         title: 'QQ',
@@ -37,8 +54,21 @@ const info = [
         desc: '唱 跳 RAP'
     }
 ]
-
 const tags = ['APEX', 'CSGO', '生化危机3', '生化危机2', '古墓丽影:暗影', '古墓丽影:崛起', '消逝的光芒'];
+
+
+const article = ref<number>(0);
+const photo = ref<number>(0);
+const message = ref<number>(0);
+
+onMounted(async () => {
+    message.value = await getMessageCount();
+    // photo.value = await getMessageCount();
+    // article.value = await getMessageCount();
+})
+
+
+
 </script>
 
 <style lang="scss" scoped>
@@ -70,6 +100,17 @@ const tags = ['APEX', 'CSGO', '生化危机3', '生化危机2', '古墓丽影:�
         display: none !important;
     }
 
+    .nums {
+        justify-content: space-evenly !important;
+
+        p {
+            font-size: $size-16 !important;
+        }
+
+        .total {
+            font-size: $size-14 !important;
+        }
+    }
 
 }
 
@@ -83,6 +124,29 @@ const tags = ['APEX', 'CSGO', '生化危机3', '生化危机2', '古墓丽影:�
     flex-direction: column;
     padding: 20px 15px;
     color: $gray-1;
+
+    .nums {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+        text-align: center;
+        user-select: none;
+
+        p {
+            font-size: $size-20;
+        }
+
+        .subtitle {
+            border-bottom: 1px solid $gray-1;
+        }
+
+        .total {
+            font-size: $size-18;
+        }
+
+    }
 
     .avater {
         width: 100%;

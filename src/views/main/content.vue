@@ -1,34 +1,76 @@
 <template>
-    <main class="main">
-        <div class="left">
-            <MyAsideLeft />
-        </div>
-        <div class="center" ref="main">
-            <router-view v-slot="{ Component }">
-                <transition name="main" mode="out-in">
-                    <component :is="Component" />
-                </transition>
-            </router-view>
-        </div>
-        <div class="rigth">
-            <MyAsideRigth @goBackTop="goBackTop" />
-        </div>
+    <main class="main" ref="main">
+        <n-message-provider placement="top" :max="5" :to="center">
+            <div class="left">
+                <MyAsideLeft />
+            </div>
+
+            <div class="center" ref="center">
+                <router-view v-slot="{ Component }">
+                    <transition name="main" mode="out-in">
+                        <component :is="Component" ref="content" />
+                    </transition>
+                </router-view>
+            </div>
+
+            <div class="rigth">
+                <MyAsideRigth @goBackTop="goBackTop" />
+            </div>
+        </n-message-provider>
     </main>
 </template>
  
 <script lang="ts" setup>
+import { tr } from 'date-fns/locale';
+import { useRoute } from 'vue-router';
+import router from '../../router';
+import { useContentStore } from '../../store'
+const contentStore = useContentStore();
+const route = useRoute();
+let main = ref<HTMLElement>();
 
-let main = ref<Element>();
-
+//内容区域返回顶部
+let center = ref<HTMLElement>();
 const goBackTop = () => {
     const timer = setInterval(() => {
-        if (main.value!.scrollTop <= 0) {
+        if (center.value!.scrollTop <= 0) {
             clearInterval(timer)
         } else {
-            main.value?.scrollTo({ left: 0, top: main.value.scrollTop - 50 })
+            center.value?.scrollTo({ left: 0, top: center.value.scrollTop - 50 })
         }
     }, 5)
 }
+
+let content = ref();
+
+let flag = ref(true);
+//监视滚动条 根据理由中meta的index加载更多不同的信息
+const watchScroll = async () => {
+    const scrollTop = center.value!.scrollTop;
+    const clientHeigth = center.value!.clientHeight;
+    const scrollHeigth = center.value!.scrollHeight;
+    if (flag.value) {
+        if ((scrollTop + clientHeigth + 50) >= scrollHeigth) {
+            if (route.meta.index == 0) {
+                // console.log('获取更多博客');
+            } else if (route.meta.index == 1) {
+                flag.value = await content.value.getMessage();
+            } else if (route.meta.index == 2) {
+                // console.log('获取更多照片');
+            }
+        }
+    }
+}
+
+//当路由切换时 重置 pageNum 和 pageSize
+watch(() => router.currentRoute.value.path, () => {
+    contentStore.$reset();
+    flag.value = true;
+}, { immediate: true })
+
+onMounted(() => {
+    center.value!.addEventListener('scroll', watchScroll);
+})
 
 </script>
 
@@ -42,6 +84,10 @@ const goBackTop = () => {
 .main-enter-from,
 .main-leave-to {
     opacity: 0;
+}
+
+:deep(.n-message-container, .n-message-container--top) {
+    top: 60px;
 }
 
 .main {
@@ -64,13 +110,14 @@ const goBackTop = () => {
 
     .center {
         width: 72%;
-        overflow-y: auto;
+        overflow-y: scroll;
+        overflow-x: hidden;
         margin: 0px 10px;
         border-radius: 10px;
         background-color: $gray-10;
 
         &::-webkit-scrollbar {
-            width: 10px;
+            width: 7px;
             height: 5px;
         }
 

@@ -23,6 +23,5 @@ const app = createApp(App);
 
 
 
-
 app.use(globalComponents).use(router).use(pinia);
 app.mount('#app')
