@@ -35,6 +35,7 @@
 
 <script lang="ts" setup>
 import { getMessageCount } from '../api/message';
+import { getPhotoCount } from '../api/photo';
 
 const info = [
     {
@@ -63,7 +64,7 @@ const message = ref<number>(0);
 
 onMounted(async () => {
     message.value = await getMessageCount();
-    // photo.value = await getMessageCount();
+    photo.value = await getPhotoCount();
     // article.value = await getMessageCount();
 })
 

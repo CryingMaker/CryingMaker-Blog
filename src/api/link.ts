@@ -14,11 +14,6 @@ export const getLink = async (pageNum: number, pageSize: number): Promise<linkDa
     return data.result.list;
 }
 
-export const sendLink = async (link: linkData) => {
-    let { data } = await Request.post('/link', link)
-    return data.result;
-}
-
 
 
 

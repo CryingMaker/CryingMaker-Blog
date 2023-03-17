@@ -25,8 +25,15 @@ type linkData = {
     readonly subTitle: string,
 }
 
+type photoData = {
+    readonly id: string,
+    readonly time: string,
+    readonly url: string,
+}
+
 export type {
     blogData,
     messageData,
-    linkData
+    linkData,
+    photoData
 }

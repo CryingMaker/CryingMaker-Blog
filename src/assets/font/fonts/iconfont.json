@@ -6,6 +6,34 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "6437432",
+      "name": "添加",
+      "font_class": "tianjia",
+      "unicode": "e62d",
+      "unicode_decimal": 58925
+    },
+    {
+      "icon_id": "18419848",
+      "name": "关闭",
+      "font_class": "guanbi",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "33855654",
+      "name": "prev",
+      "font_class": "prev",
+      "unicode": "e613",
+      "unicode_decimal": 58899
+    },
+    {
+      "icon_id": "33855658",
+      "name": "next",
+      "font_class": "next",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
       "icon_id": "6805582",
       "name": "Sun",
       "font_class": "Sun",

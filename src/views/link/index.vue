@@ -32,8 +32,8 @@ const getLinks = async () => {
 }
 
 
-onMounted(() => {
-    getLinks();
+onMounted(async () => {
+    await getLinks();
 })
 
 
