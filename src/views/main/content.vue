@@ -8,7 +8,9 @@
             <div class="center" ref="center">
                 <router-view v-slot="{ Component }">
                     <transition name="main" mode="out-in">
-                        <component :is="Component" ref="content" />
+                        <keep-alive>
+                            <component :is="Component" ref="content" />
+                        </keep-alive>
                     </transition>
                 </router-view>
             </div>
@@ -21,14 +23,10 @@
 </template>
  
 <script lang="ts" setup>
-import { tr } from 'date-fns/locale';
 import { useRoute } from 'vue-router';
-import router from '../../router';
-import { useContentStore } from '../../store'
-const contentStore = useContentStore();
 const route = useRoute();
-let main = ref<HTMLElement>();
 
+let main = ref<HTMLElement>();
 //内容区域返回顶部
 let center = ref<HTMLElement>();
 const goBackTop = () => {
@@ -41,32 +39,25 @@ const goBackTop = () => {
     }, 5)
 }
 
+//获取内容元素
 let content = ref();
 
-let flag = ref(true);
 //监视滚动条 根据理由中meta的index加载更多不同的信息
 const watchScroll = async () => {
     const scrollTop = center.value!.scrollTop;
     const clientHeigth = center.value!.clientHeight;
     const scrollHeigth = center.value!.scrollHeight;
-    if (flag.value) {
-        if ((scrollTop + clientHeigth + 50) >= scrollHeigth) {
-            if (route.meta.index == 0) {
-                // console.log('获取更多博客');
-            } else if (route.meta.index == 1) {
-                flag.value = await content.value.getMessage();
-            } else if (route.meta.index == 2) {
-                // console.log('获取更多照片');
-            }
+
+    if ((scrollTop + clientHeigth + 50) >= scrollHeigth) {
+        if (route.meta.index == 0) {
+        } else if (route.meta.index == 1) {
+            await content.value.getMessage();
+        } else if (route.meta.index == 2) {
+            await content.value.getPhotos();
         }
     }
 }
 
-//当路由切换时 重置 pageNum 和 pageSize
-watch(() => router.currentRoute.value.path, () => {
-    contentStore.$reset();
-    flag.value = true;
-}, { immediate: true })
 
 onMounted(() => {
     center.value!.addEventListener('scroll', watchScroll);
@@ -92,13 +83,30 @@ onMounted(() => {
 
 .main {
     width: 95%;
-    height: 93vh;
+    height: 90vh;
     border-radius: 10px;
     margin: 80px auto;
     margin-top: 60px;
     margin-bottom: 0px;
     display: flex;
     padding: 10px 20px;
+
+    .add {
+        position: fixed;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        width: 20%;
+        height: 3%;
+        background-color: $gray-10;
+        border-top-right-radius: 10px;
+        border-top-left-radius: 10px;
+        color: $gray-1;
+        text-align: center;
+        letter-spacing: 3px;
+        cursor: pointer;
+    }
+
 
     .left {
         width: 18%;

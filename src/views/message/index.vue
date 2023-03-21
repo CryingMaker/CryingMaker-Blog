@@ -3,7 +3,7 @@
         <div class="message" ref="message">
             <div class="message-box">
                 <div class="list" v-for="(item, index) in messageList" :key="index"
-                    :style="`background:${solidColor[item.color]}`">
+                    :style="`background:${color[item.color]}`">
                     <div class="m-top">
                         <div class="name">作者: <span>{{ item.author }}</span></div>
                         <div class="time">{{ item.time }}</div>
@@ -11,34 +11,40 @@
                     <div class="m-bottom">{{ item.content }}</div>
                 </div>
             </div>
-        </div>
 
-        <div class="comment" :class="{ isShow: isShowComment }">
-            <div class="btn" @click="trigger()">
-                {{ isShowComment ? '展开' : '关闭' }}
-                <div class="line"></div>
+            <div class="add" @click="showModal = true">
+                添加一条留言
             </div>
 
-            <div class="top">
-                <div class="colors">
-                    <div v-for="(item, index) in solidColor" :style="`background:${item}`" :key="index"
-                        @click="colorActive = index" :class="{ active: colorActive == index }"></div>
-                </div>
+            <n-modal v-model:show="showModal" :on-after-leave="onModalClose" transform-origin="mouse" class="modal">
+                <n-card title="留下一条留言吧!" :bordered="true" size="huge" role="dialog" aria-modal="true">
+                    <template #header-extra>
+                        <svg class="icon svg-icon close-icon" aria-hidden="true" @click="showModal = false">
+                            <use xlink:href="#icon-guanbi"></use>
+                        </svg>
+                    </template>
+                    <div class="top">
+                        <div class="colors">
+                            <div v-for="(item, index) in color" :style="`background:${item}`" :key="index"
+                                @click="colorActive = index" :class="{ active: colorActive == index }"></div>
+                        </div>
 
-                <div class="author">
-                    <span class="text"></span>
-                    <n-space vertical>
-                        <n-input-group>
-                            <n-input size="medium" placeholder="请输入名字..." maxlength="20" v-model:value="author" />
-                            <n-button type="success" @click="submit()">发送</n-button>
-                        </n-input-group>
-                    </n-space>
-                </div>
-            </div>
-            <div class="textarea">
-                <textarea name="comment" id="textarea" maxlength="240" :style="`background:${solidColor[colorActive]}`"
-                    v-model="content" placeholder="请输入内容...."></textarea>
-            </div>
+                        <div class="author">
+                            <span class="text">作者:</span>
+                            <n-space vertical>
+                                <n-input-group>
+                                    <n-input placeholder="请输入名字..." maxlength="20" v-model:value="author" />
+                                    <n-button type="success" @click="submit()">发送</n-button>
+                                </n-input-group>
+                            </n-space>
+                        </div>
+                    </div>
+                    <div class="textarea">
+                        <textarea name="comment" id="textarea" maxlength="240" :style="`background:${color[colorActive]}`"
+                            v-model="content" placeholder="请输入内容...."></textarea>
+                    </div>
+                </n-card>
+            </n-modal>
         </div>
     </div>
 </template>
@@ -50,33 +56,19 @@ import { messageData } from '../../types';
 import { getMessages, sendMessage } from '../../api/message';
 import { nanoid } from 'nanoid';
 import { useContentStore } from '../../store'
+import { color } from '../../constant'
 const message = useMessage();
 const contentStore = useContentStore();
 
-const solidColor = [//11条
-    'linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%)',
-    'linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%)',
-    'linear-gradient(to top, #fad0c4 0%, #ffd1ff 100%)',
-    'linear-gradient(to right, #ffecd2 0%, #fcb69f 100%)',
-    'linear-gradient(to right, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%, #b12a5b 100%)',
-    'linear-gradient(to top, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)',
-    'linear-gradient(120deg, #f6d365 0%, #fda085 100%)',
-    'linear-gradient(to top, #fbc2eb 0%, #a6c1ee 100%)',
-    'linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%)',
-    'linear-gradient(to right, #fa709a 0%, #fee140 100%)',
-    'linear-gradient(to top, #37ecba 0%, #72afd3 100%)',
-]
+//是否显示留言框
+let showModal = ref(false);
 //选中的颜色
 let colorActive = ref(0);
-
-//是否显示评论对话框
-let isShowComment = ref(true);
-const trigger = () => {
-    isShowComment.value = !isShowComment.value;
-}
 //绑定作者和留言内容
 let author = ref<string>('')
 let content = ref<string>('')
+//所有留言数据
+let messageList = ref<Array<messageData>>([]);
 
 // 处理留言提交
 const submit = async () => {
@@ -95,34 +87,27 @@ const submit = async () => {
             message.success('留言成功!')
             messageList.value.unshift(tempData)
             author.value = content.value = ''
+            showModal.value = false;
         } catch (error) {
             message.error('留言失败!')
         }
     }
 }
 
-//留言数据
-let messageList = ref<Array<messageData>>([]);
-
-
 // 请求留言信息
 const getMessage = async () => {
     try {
-        if (contentStore.pageNum) {
-            let res: Array<messageData> = await getMessages(contentStore.pageNum, contentStore.pageSize);
+        if (contentStore.messagePageNum) {
+            let res: Array<messageData> = await getMessages(contentStore.messagePageNum, 20);
             messageList.value = messageList.value.concat(...res);
-            contentStore.incrementPageNum();
-
-            if (res.length < contentStore.pageSize) {
-                contentStore.setPageNum(0);
-                message.info('没有更多留言了!');
-                return false;
+            contentStore.messagePageNum++;
+            if (res.length < 20) {
+                contentStore.messagePageNum = 0;
             }
-            return true;
         }
     } catch (error) {
-        message.error('获取留言失败!');
-        return false;
+        contentStore.messagePageNum = 0;
+        console.error(error);
     }
 }
 //将获取信息的方法给到center
@@ -131,15 +116,179 @@ onMounted(async () => {
     await getMessage();
 })
 
+//当对话框关闭 清除所有数据
+const onModalClose = () => {
+    author.value = content.value = ''
+}
 
-
+//所有center的组件已经被缓存 当切换的时候 关闭弹窗
+onDeactivated(() => {
+    showModal.value = false;
+})
 
 </script>
 
 <style lang="scss" scoped>
+//媒体查询适应 移动端
+@media screen and (max-width: 1350px) {
+
+    :deep(.n-card-header) {
+        padding: 20px 15px;
+    }
+
+    :deep(.n-card__content) {
+        padding: 10px 15px;
+    }
+
+    :deep(.n-card) {
+        width: 80%;
+    }
+
+    .top {
+        flex-direction: column;
+
+        .colors {
+            margin-bottom: 30px;
+        }
+    }
+}
+
+@media screen and (max-width:1100px) {
+
+    .modal {
+        width: 100% !important;
+        margin-top: 50px !important;
+
+        .close-icon {
+            font-size: 40px;
+        }
+
+        .colors {
+            justify-content: space-between !important;
+        }
+
+        #textarea {
+            height: 250px;
+        }
+    }
+
+    .message-box {
+        column-count: 2 !important;
+
+        .list {
+            .m-top {
+                flex-direction: column-reverse;
+            }
+        }
+    }
+}
+
+//弹窗
+.modal {
+    margin-top: 100px;
+    width: 60%;
+
+    .close-icon {
+        font-size: 50px;
+        color: $gray-3;
+        cursor: pointer;
+        transition: all .2s linear;
+
+        &:hover {
+            color: $gray-1;
+        }
+    }
+
+    .top {
+        width: 100%;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+
+        .author {
+            color: $gray-1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .text {
+                margin-right: 20px;
+                min-width: 50px;
+                font-size: $size-18;
+            }
+        }
+
+        .colors {
+
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-wrap: wrap;
+
+            .active {
+                transform: scale(1);
+            }
+
+            div {
+                cursor: pointer;
+                width: 50px;
+                height: 50px;
+                transition: all .2s ease-out;
+                border-radius: 5px;
+                transform: scale(.8);
+            }
+        }
+    }
+
+    .textarea {
+        width: 100%;
+        border-radius: 10px;
+        overflow: hidden;
+        opacity: .8;
+
+        #textarea {
+            width: 100%;
+            min-height: 200px;
+            resize: none;
+            color: $gray-1;
+            font-size: $size-20;
+            padding: 10px 20px;
+            letter-spacing: 2px;
+            border: 0;
+            border-radius: 10px;
+        }
+    }
+}
+
+//添加按钮
+.add {
+    position: fixed;
+    left: 50%;
+    bottom: 0%;
+    background-color: $gray-10;
+    color: $gray-1;
+    z-index: 9;
+    transition: all .2s ease-in;
+    user-select: none;
+    transform: translateX(-50%);
+    padding: 3px 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 3px;
+
+    &:hover {
+        font-size: $size-16;
+    }
+}
+
+//主要样式
 .message {
     width: 100%;
     padding: 20px 10px 30px 10px;
+    position: relative;
 
     .message-box {
         width: 100%;
@@ -194,164 +343,6 @@ onMounted(async () => {
                 word-break: break-all;
                 letter-spacing: 1px;
             }
-        }
-    }
-}
-
-
-@media screen and (max-width: 1350px) {
-    .comment {
-        left: 20.2% !important;
-        width: 75.2% !important;
-    }
-}
-
-@media screen and (max-width:1100px) {
-    .comment {
-        left: 0% !important;
-        width: 100% !important;
-
-        .top {
-            width: 100%;
-
-            .colors {
-                height: 100%;
-
-
-                div {
-                    width: 35px !important;
-                    height: 35px !important;
-                    margin-right: 3px !important;
-                }
-            }
-
-            .author {
-                flex-direction: column;
-            }
-        }
-
-    }
-
-    .message-box {
-        column-count: 2 !important;
-
-        .list {
-            .m-top {
-                flex-direction: column-reverse;
-            }
-        }
-    }
-}
-
-.isShow {
-    transform: translateY(100%);
-}
-
-.comment {
-    width: 66.3%;
-    height: 250px;
-    position: fixed;
-    bottom: 0;
-    left: 20.5%;
-    border-top-right-radius: 10px;
-    border-top-left-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #202020;
-    padding: 0px 10px;
-    transition: all .2s linear;
-    border-top: 1px solid $gray-3;
-
-    .btn {
-        width: 20%;
-        height: 10%;
-        position: relative;
-        top: -10%;
-        background-color: $gray-1;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-        color: $gray-10;
-        text-align: center;
-        cursor: pointer;
-
-
-        .line {
-            width: 100%;
-            height: 1px;
-            background-color: $gray-2;
-            position: absolute;
-            bottom: 0;
-        }
-    }
-
-    .top {
-        width: 100%;
-        height: 30%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: -5%;
-
-        .author {
-            height: 100%;
-            color: $gray-3;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            :deep(.n-input__input-el) {
-                color: #202020;
-                border: transparent;
-            }
-
-            .text {
-                padding-right: 10px;
-                min-width: 48px;
-            }
-        }
-
-        .colors {
-            height: 100%;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            flex-wrap: wrap;
-
-            .active {
-                transform: scale(.7);
-            }
-
-            div {
-                cursor: pointer;
-                width: 50px;
-                height: 50px;
-                transition: all .2s ease-out;
-                border-radius: 999px;
-                transform: scale(.5);
-            }
-        }
-    }
-
-    .textarea {
-        width: 100%;
-        height: 60%;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-        overflow: hidden;
-        opacity: .8;
-
-        #textarea {
-            width: 100%;
-            height: 100%;
-            resize: none;
-            color: $gray-1;
-            font-size: $size-14;
-            padding: 5px 10px;
-            letter-spacing: 2px;
-            border: 0;
-            transition: all .2s ease-out;
         }
     }
 }

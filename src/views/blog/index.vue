@@ -21,7 +21,10 @@
 
 <script lang="ts" setup>
 import { blogData } from '../../types';
-
+import { useMessage } from 'naive-ui';
+import { useContentStore } from '../../store';
+const contentStore = useContentStore();
+const message = useMessage();
 //临时数据
 const data: blogData = {
     carousel_img: [
@@ -40,38 +43,51 @@ const data: blogData = {
 }
 
 
+onMounted(() => {
+    message.error('博客界面还没做....')
+})
+
 </script>
 
 <style lang="scss" scoped>
 @media screen and (max-width: 1100px) {
+    .blog {
+        padding: 20px 0px !important;
 
-    .item {
-        height: 200px !important;
+        .item {
+            height: 300px !important;
+            width: 98% !important;
+            flex-direction: column !important;
 
 
-        .image {
-            width: 40% !important;
-        }
-
-        .content {
-            width: 60% !important;
-        }
-
-        .content {
-            padding: 0px !important;
-            padding-left: 10px !important;
-
-            .title {
-                font-size: 20px !important;
+            .image {
+                width: 100% !important;
+                height: 50% !important;
+                clip-path: polygon(0% 0%, 100% 0%, 100% 90%, 0 100%) !important;
             }
 
-            .publish-time {
-                font-size: $size-16 !important;
+            &:nth-child(odd) .image {
+                clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0 90%) !important;
             }
 
-            .subtitle {
-                font-size: $size-12 !important;
+            .content {
+                width: 100% !important;
+                height: 50% !important;
+                padding: 0px !important;
+                padding-left: 10px !important;
 
+                .title {
+                    font-size: 20px !important;
+                }
+
+                .publish-time {
+                    font-size: $size-16 !important;
+                }
+
+                .subtitle {
+                    font-size: $size-12 !important;
+
+                }
             }
         }
     }
@@ -82,7 +98,7 @@ const data: blogData = {
     padding: 20px 10px;
 
     .carousel {
-        width: 95%;
+        width: 98%;
         height: 300px;
         margin: 0px auto;
         border-radius: 10px;

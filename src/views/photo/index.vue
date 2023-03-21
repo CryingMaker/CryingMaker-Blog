@@ -1,13 +1,19 @@
 <template>
     <div class="photo">
-        <div class="item" v-for="(item, index) in photoList" :key="item.id" @click="handleClick(item.url)">
-            <img :src="`http://rr7bir25x.hd-bkt.clouddn.com/${item.url}`">
+        <div class="item" v-for="(item, index) in photoList" :key="item.id" @click="handleClick(index)">
+            <img :src="prefixUrl + item.url">
         </div>
 
-        <n-button @click="showModal = true">添加一张图片</n-button>
-        <n-modal v-model:show="showModal" transform-origin="center" :onMaskClick="onClose" class="modal">
-            <n-card style="width: 80%;" title="留下一张图片吧!(一次只能上传一张照片哦)" :bordered="true" size="huge" role="dialog"
-                aria-modal="true">
+        <div class="add" @click="showModal = true">添加一张图片</div>
+
+        <n-modal v-model:show="showModal" transform-origin="mouse" :on-after-leave="onModalClose" :onMaskClick="onClose"
+            class="modal">
+            <n-card title="留下一张图片吧!" :bordered="true" size="huge" role="dialog" aria-modal="true">
+                <template #header-extra>
+                    <svg class="icon svg-icon close-icon" aria-hidden="true" @click="showModal = false">
+                        <use xlink:href="#icon-guanbi"></use>
+                    </svg>
+                </template>
                 <div class="add-box" for="file">
                     <label class="add-btn" v-show="isShowAdd">
                         <input type="file" id="file" name="flie" ref="file" accept="image/*" @change="fileChange()">
@@ -21,8 +27,10 @@
                     </div>
 
                     <div class="footer">
-                        <n-space>
+                        <n-space class="btn-group">
                             <n-button :loading="loading" @click="handleUpload()">上传图片</n-button>
+                            <n-button type="primary" v-if="!isShowAdd"><label for="file"
+                                    class="label">换一张图</label></n-button>
                             <n-button type="error" @click="cancelUpload()">取消上传</n-button>
                         </n-space>
                     </div>
@@ -40,19 +48,19 @@
                     </div>
                 </div>
                 <div class="m">
-                    <img :src="`http://rr7bir25x.hd-bkt.clouddn.com/${viewerUrl}`">
+                    <img :src="prefixUrl + viewerUrl">
                 </div>
                 <div class="r">
-                    <div class="close" @click="closeViewer()">
-                        <svg class="icon svg-icon" aria-hidden="true">
-                            <use xlink:href="#icon-guanbi"></use>
-                        </svg>
-                    </div>
                     <div @click="next()">
                         <svg class="icon svg-icon" aria-hidden="true">
                             <use xlink:href="#icon-next"></use>
                         </svg>
                     </div>
+                </div>
+                <div class="close" @click="isShowViewer = false;">
+                    <svg class="icon svg-icon" aria-hidden="true">
+                        <use xlink:href="#icon-guanbi"></use>
+                    </svg>
                 </div>
             </div>
         </Transition>
@@ -67,16 +75,36 @@ import { getToken, getPhoto, sendPhoto } from '../../api/photo'
 import { useContentStore } from '../../store';
 import { photoData } from '../../types';
 import { getTime } from '../../utils'
+import { prefixUrl } from '../../constant';
 const contentStore = useContentStore();
 const message = useMessage();
 
 
 //按钮是否显示加载状态
 const loading = ref()
+//input框 用来获取上传的文件
+const file = ref();
+//临时文件 预览
+const tempUrl = ref();
+//是否显示添加照片modal
+let showModal = ref(false);
+//是否显示添加图片按钮
+let isShowAdd = ref(true);
+//七牛云上传返回的对象 可以用来取消上传
+let subscription: any;
+//所有照片数据
+let photoList = ref<Array<photoData>>([]);
+//当前查看的照片的索引
+let selectdIndex = ref(0);
+//用来做临时图片路径
+let viewerUrl = ref<string>('')
+//是否显示 查看图片
+let isShowViewer = ref(false);
 
 //处理图片上传
 const handleUpload = () => {
     loading.value = true;
+
     if (!file.value.files[0]) {
         message.error('图片不能为空');
         loading.value = false;
@@ -85,26 +113,6 @@ const handleUpload = () => {
     upload();
 }
 
-//取消图片上传
-const cancelUpload = () => {
-    onClose();
-    showModal.value = false;
-    //在上传过程中也可以取消
-    if (subscription) {
-        subscription.unsubscribe();
-        message.warning('取消上传成功')
-    }
-}
-
-
-//真实文件
-const file = ref();
-
-//临时文件
-const tempUrl = ref()
-
-
-let subscription: any;
 //上传图片
 const upload = async () => {
     let key = nanoid() + new Date().getTime();
@@ -126,44 +134,26 @@ const upload = async () => {
             loading.value = false;
             isShowViewer.value = false;
             showModal.value = false;
-            message.success('图片上传成功!');
         }
     }
     subscription = observable.subscribe(observer) // 上传开始
 }
 
-
-//是否显示添加照片modal
-let showModal = ref(false);
-//是否显示添加图片按钮
-let isShowAdd = ref(true);
-
-//取消添加图片
-const onClose = () => {
-    isShowAdd.value = true;
-}
-
-
-//实时检测图片是否改变 并且显示
-const fileChange = () => {
-    let reader = new FileReader();
-    reader.onload = () => {
-        // 当 FileReader 读取文件时候，读取的结果会放在 FileReader.result 属性中
-        tempUrl.value = reader.result;
+//取消图片上传
+const cancelUpload = () => {
+    onClose();
+    showModal.value = false;
+    //在上传过程中也可以取消
+    if (subscription) {
+        subscription.unsubscribe();
+        message.warning('取消上传成功');
     }
-    reader.readAsDataURL(file.value.files[0])
-    isShowAdd.value = false;
 }
 
-
-
-//照片数据
-let photoList = ref<Array<photoData>>([]);
-
-//上传照片
+//将上传的图片数据(上传时间 图片路径)插入数据库
 const sendPhotos = async (url: string) => {
     try {
-        let tempData = { id: nanoid(), time: getTime(), url }
+        let tempData: photoData = { id: nanoid(), time: getTime(), url }
         await sendPhoto(tempData);
         photoList.value.unshift(tempData);
         message.success('图片上传成功!')
@@ -173,60 +163,98 @@ const sendPhotos = async (url: string) => {
     }
 }
 
-// 请求照片信息
-const getPhotos = async () => {
-    try {
-        if (contentStore.pageNum) {
-            let res: Array<photoData> = await getPhoto(contentStore.pageNum, contentStore.pageSize);
-            photoList.value = photoList.value.concat(...res);
-            contentStore.incrementPageNum();
+//取消添加图片
+const onClose = () => {
+    isShowAdd.value = true;
+}
 
-            if (res.length < contentStore.pageSize) {
-                contentStore.setPageNum(0);
-                message.info('没有更多照片了!');
-                return false;
-            }
-            return true;
-        }
-    } catch (error) {
-        console.error(error);
-        message.error('获取照片失败!');
-        return false;
+//实时检测图片是否改变 并且显示
+const fileChange = () => {
+    let reader = new FileReader();
+    reader.onload = () => {
+        // 当 FileReader 读取文件时候，读取的结果会放在 FileReader.result 属性中
+        tempUrl.value = reader.result;
+    }
+    if (file.value.files[0]) {
+        reader.readAsDataURL(file.value.files[0])
+        isShowAdd.value = false;
     }
 }
 
+// 请求照片信息
+const getPhotos = async () => {
+    try {
+        if (contentStore.photoPageNum) {
+            let res: Array<photoData> = await getPhoto(contentStore.photoPageNum, 10);
+            photoList.value = photoList.value.concat(...res);
+            contentStore.photoPageNum++;
+
+            if (res.length < 10) {
+                contentStore.photoPageNum = 0;
+                message.info('没有更多照片了!');
+            }
+        }
+    } catch (error) {
+        contentStore.photoPageNum = 0;
+        console.error(error);
+        message.error('获取照片失败!');
+    }
+}
+//将获取照片的方法给到center
+defineExpose({ getPhotos });
 
 //处理点击图片事件
-const handleClick = (url: string) => {
-    viewerUrl.value = url;
+const handleClick = (index: number) => {
+    selectdIndex.value = index;
+    viewerUrl.value = photoList.value[selectdIndex.value].url;
     isShowViewer.value = true;
 }
 
-
-let viewerUrl = ref<string>('')
-let isShowViewer = ref(false);
-//是否显示viewer
-const closeViewer = () => {
-    isShowViewer.value = false;
-}
-
-//图片的切换
+//图片的切换 循环切换
 const next = () => {
-    console.log('next');
+    if (selectdIndex.value + 1 > photoList.value.length - 1)
+        selectdIndex.value = -1;
+    handleClick(++selectdIndex.value)
 }
 const previous = () => {
-    console.log('previous');
+    if (selectdIndex.value - 1 < 0)
+        selectdIndex.value = photoList.value.length;
+    handleClick(--selectdIndex.value)
 }
 
+//当 modal 关闭时清空数据
+const onModalClose = () => {
+    viewerUrl.value = '';
+}
 
+//首次加载 获取照片数据
 onMounted(async () => {
     await getPhotos();
+})
+
+//所有center的组件已经被缓存 当切换的时候 关闭弹窗
+onDeactivated(() => {
+    showModal.value = false;
 })
 
 </script>
 
 <style lang="scss" scoped>
+//媒体查询适应 移动端
 @media screen and (max-width:1350px) {
+
+    :deep(.n-card-header) {
+        padding: 20px 15px;
+    }
+
+    :deep(.n-card__content) {
+        padding: 10px 15px;
+    }
+
+    :deep(.n-card) {
+        width: 80%;
+    }
+
     .photo {
         column-count: 2 !important;
 
@@ -237,18 +265,61 @@ onMounted(async () => {
 }
 
 @media screen and (max-width:1100px) {
+
+    .modal {
+        width: 100% !important;
+        margin-top: 60px !important;
+
+        .close-icon {
+            font-size: 40px !important;
+        }
+    }
+
     .photo {
         column-count: 1 !important;
 
         .item {
             margin-bottom: 30px !important;
         }
+
+        .viewer {
+
+            .l,
+            .r {
+                position: absolute;
+                bottom: 0;
+
+                div {
+                    opacity: 1 !important;
+                }
+
+            }
+
+            .l {
+                left: 0;
+            }
+
+            .r {
+                right: 0;
+            }
+
+            .m {
+                width: 100% !important;
+                justify-content: inherit !important;
+            }
+        }
     }
+
+    .add-btn {
+        height: 200px !important;
+    }
+
+
 }
 
 .fade-enter-active,
 .fade-leave-active {
-    transition: all .2s ease-in-out;
+    transition: all .3s ease-in-out;
     opacity: 1;
 }
 
@@ -257,9 +328,21 @@ onMounted(async () => {
     opacity: 0;
 }
 
+//弹窗
 .modal {
     margin-top: 60px;
+    width: 80%;
 
+    .close-icon {
+        font-size: 50px;
+        color: $gray-3;
+        cursor: pointer;
+        transition: all .2s linear;
+
+        &:hover {
+            color: $gray-1;
+        }
+    }
 
     .add-box {
         width: 100%;
@@ -275,7 +358,7 @@ onMounted(async () => {
             height: 300px;
             font-size: 50px;
             border-radius: 10px;
-            border: 1px solid $gray-1;
+            border: 1px solid black;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -294,19 +377,48 @@ onMounted(async () => {
             }
         }
 
+        .btn-group {
+            gap: 0px !important;
+
+            justify-content: space-between !important;
+        }
+
         .footer {
             margin-top: 20px;
         }
+
     }
 }
 
+//添加按钮
+.add {
+    position: fixed;
+    left: 50%;
+    bottom: 0%;
+    background-color: $gray-10;
+    color: $gray-1;
+    z-index: 9;
+    transition: all .2s ease-in;
+    user-select: none;
+    transform: translateX(-50%);
+    padding: 3px 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 3px;
 
+    &:hover {
+        font-size: $size-16;
+    }
+}
+
+//主要样式
 .photo {
     width: 100%;
     padding: 20px 10px;
     column-count: 3;
     column-gap: 20px;
-
+    position: relative;
 
 
 
@@ -340,18 +452,22 @@ onMounted(async () => {
             }
         }
 
-        .r {
-            .close {
-                position: absolute;
-                top: 0px;
-                opacity: .8;
-            }
+        .close {
+            position: absolute;
+            right: 3%;
+            top: 0px;
+            opacity: .8;
+            font-size: 60px;
+            cursor: pointer;
         }
 
         .m {
-            overflow-y: scroll;
+            overflow: scroll;
             width: 78%;
+            height: 100%;
             margin: 0px 1%;
+            display: flex;
+            justify-content: center;
 
             &::-webkit-scrollbar {
                 width: 0px;
@@ -359,7 +475,8 @@ onMounted(async () => {
             }
 
             img {
-                width: 100%;
+                width: auto;
+                height: 100%;
             }
         }
 
@@ -408,13 +525,12 @@ onMounted(async () => {
         &::before {
             content: '';
             text-align: center;
-            color: $gray-10;
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: $gray-1;
+            background-color: #202020;
             opacity: 0;
             transition: all .2s linear;
             z-index: 9;
@@ -424,7 +540,7 @@ onMounted(async () => {
             content: '查看大图';
             letter-spacing: 3px;
             font-size: $size-20;
-            color: $gray-10;
+            color: #FFFFFF;
             position: absolute;
             left: 50%;
             top: 50%;

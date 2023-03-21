@@ -1,5 +1,4 @@
 <template>
-    
     <MyHeader />
     <router-view></router-view>
 </template>
@@ -8,6 +7,4 @@
 
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

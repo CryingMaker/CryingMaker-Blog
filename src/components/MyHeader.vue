@@ -3,9 +3,14 @@
         <div class="logo">CryingMaker</div>
         <nav class="nav">
             <div :class="{ isActive: header.index == index }" @click="handleNav(index, item.path)"
-                v-for="(item, index) in nav" :key="index">{{ item.name }}</div>
+                v-for="(item, index) in navList" :key="index">{{ item.name }}</div>
         </nav>
-        <Theme @click="trigger()" />
+        <n-popover trigger="hover" placement="bottom">
+            <template #trigger>
+                <Theme @click="trigger()" />
+            </template>
+            切换主题
+        </n-popover>
 
         <div class="more" @click="handleNavList()">
             <svg class="icon svg-icon" aria-hidden="true">
@@ -21,7 +26,7 @@
             <div class="line"></div>
             <div class="modal-nav">
                 <div :class="{ isActive: header.index == index }" @click="handleNav(index, item.path)"
-                    v-for="(item, index) in nav" :key="index">{{ item.name }}</div>
+                    v-for="(item, index) in navList" :key="index">{{ item.name }}</div>
             </div>
             <div class="theme-box">
                 <div class="center">
@@ -32,7 +37,7 @@
         </div>
     </transition>
 
-    <transition name="modal" mode="out-in">
+    <transition name="mask" mode="in-out">
         <div class="mask" v-if="clientWidth < 1100" v-show="header.modal" @click="header.modal = 0"></div>
     </transition>
 </template>
@@ -40,26 +45,21 @@
 <script lang="ts" setup>
 import { useRouter, useRoute } from 'vue-router';
 import { useHeaderStore } from '../store';
+import { navList } from '../constant'
 const header = useHeaderStore();
 const router = useRouter();
 const route = useRoute();
 
-const nav = [
-    { name: '博客', path: 'blog', },
-    { name: '留言', path: 'message', },
-    { name: '照片', path: 'photo', },
-    { name: '友情链接', path: 'link', },
-    { name: '关于本站', path: 'about', }
-];
 
 //用户点击nav 切换路由
 const handleNav = (index: number, path: string) => {
-    router.replace(path);
+    router.push(path);
     header.setIndex(index);
 }
 
-//获取用户屏幕宽度 如果小于800 那么不加载 modal 模块
+//用户屏幕宽度
 let clientWidth = ref<number>(0);
+//获取用户屏幕宽度 如果小于800 那么不加载 modal 模块
 const getWindowResize = () => {
     clientWidth.value = document.body.clientWidth;
 }
@@ -103,6 +103,17 @@ onMounted(() => {
 .modal-leave-to {
     opacity: 0;
     transform: translateX(100%);
+}
+
+.mask-enter-active,
+.mask-leave-active {
+    transition: all .5s ease-out;
+    opacity: .5 !important;
+}
+
+.mask-enter-from,
+.mask-leave-to {
+    opacity: 0 !important;
 }
 
 .header {
@@ -193,7 +204,7 @@ onMounted(() => {
     left: 0;
     background-color: $gray-10;
     opacity: .5;
-    z-index: 999;
+    z-index: 9990;
 }
 
 .modal {

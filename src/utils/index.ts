@@ -19,15 +19,3 @@ export const getTime = (e: Date = new Date): string => {
 
     return `${year}/${monthS}/${dayS} ${hours}:${minutes}:${seconds}`
 }
-
-// export const getObjectURL = (file: File) => {
-//     let url = null;
-//     if (window.createObjectURL != undefined) {
-//         url = window.createObjectURL(file);
-//     } else if (window.URL != undefined) {
-//         url = window.URL.createObjectURL(file);
-//     } else if (window.webkitURL != undefined) {
-//         url = window.webkitURL.createObjectURL(file);
-//     }
-//     return url;
-// }

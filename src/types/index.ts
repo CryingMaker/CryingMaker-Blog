@@ -17,13 +17,7 @@ type messageData = {
     readonly color: number,
 }
 
-type linkData = {
-    readonly id: string,
-    readonly url: string,
-    readonly imageUrl: string,
-    readonly title: string,
-    readonly subTitle: string,
-}
+
 
 type photoData = {
     readonly id: string,
@@ -34,6 +28,5 @@ type photoData = {
 export type {
     blogData,
     messageData,
-    linkData,
     photoData
 }

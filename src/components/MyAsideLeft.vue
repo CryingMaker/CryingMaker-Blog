@@ -6,28 +6,38 @@
         </div>
 
         <div class="info">
-            <div v-for="(item, index) in info" :key="index"><span>{{ item.title }}: </span>{{ item.desc }}</div>
+            <n-gradient-text :gradient="color[Math.floor(Math.random() * color.length)]" v-for="(item, index) in info"
+                :key="index">
+                <span>{{ item.title }}: </span>{{ item.desc }}
+            </n-gradient-text>
         </div>
 
         <div class="tags">
             <div class="title">标签</div>
             <div class="list">
-                <div v-for="(item, index) in tags" :key="item">{{ item }}</div>
+                <n-tag :bordered="false" :type="getType()" :size="size()" v-for="(item, index) in tags" :key="item">{{ item
+                }}</n-tag>
             </div>
         </div>
 
         <div class="nums">
             <div>
                 <p class="subtitle">文章</p>
-                <p class="total">{{ article }}</p>
+                <p class="total">
+                    <n-number-animation ref="blogNum" :show-separator="false" :from="0" :to="article" :active="true" />
+                </p>
             </div>
             <div>
                 <p class="subtitle">留言</p>
-                <p class="total">{{ message }}</p>
+                <p class="total">
+                    <n-number-animation ref="messageNum" :show-separator="false" :from="0" :to="message" :active="true" />
+                </p>
             </div>
             <div>
                 <p class="subtitle">照片</p>
-                <p class="total">{{ photo }}</p>
+                <p class="total">
+                    <n-number-animation ref="photoNum" :show-separator="false" :from="0" :to="photo" :active="true" />
+                </p>
             </div>
         </div>
     </aside>
@@ -36,37 +46,38 @@
 <script lang="ts" setup>
 import { getMessageCount } from '../api/message';
 import { getPhotoCount } from '../api/photo';
+import { color, info, tags } from '../constant'
 
-const info = [
-    {
-        title: 'QQ',
-        desc: '1078156056'
-    },
-    {
-        title: '邮箱',
-        desc: '1078156056@qq.com'
-    },
-    {
-        title: '地址',
-        desc: '湖北 武汉'
-    },
-    {
-        title: '爱好',
-        desc: '唱 跳 RAP'
-    }
-]
-const tags = ['APEX', 'CSGO', '生化危机3', '生化危机2', '古墓丽影:暗影', '古墓丽影:崛起', '消逝的光芒'];
-
+const articleNum = ref();
+const photoNum = ref();
+const messageNum = ref();
 
 const article = ref<number>(0);
 const photo = ref<number>(0);
 const message = ref<number>(0);
 
+
+type tagType = "error" | "primary" | "info" | "success" | "warning";
+const getType = (): tagType => {
+    const tagTypes: tagType[] = ["error", "primary", "info", "success", "warning"];
+    const randomIndex = Math.floor(Math.random() * tagTypes.length);
+    return tagTypes[randomIndex];
+}
+
+type sizeType = "small" | "medium" | "large";
+const size = (): sizeType => {
+    const sizes: sizeType[] = ["small", "medium", "large"];
+    const randomIndex = Math.floor(Math.random() * sizes.length);
+    return sizes[randomIndex];
+}
+
+
 onMounted(async () => {
+    article.value = await getMessageCount();
     message.value = await getMessageCount();
     photo.value = await getPhotoCount();
-    // article.value = await getMessageCount();
 })
+
 
 
 
@@ -129,11 +140,12 @@ onMounted(async () => {
     .nums {
         width: 100%;
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
         align-items: center;
         margin-top: 20px;
         text-align: center;
         user-select: none;
+
 
         p {
             font-size: $size-20;
@@ -197,10 +209,6 @@ onMounted(async () => {
         flex-direction: column;
         font-size: $size-18;
         margin-top: 20px;
-
-        span {
-            user-select: none;
-        }
     }
 
     .tags {
@@ -218,15 +226,10 @@ onMounted(async () => {
         }
 
         .list {
-            display: flex;
-            justify-content: flex-start;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            margin-top: 5px;
 
             div {
-                padding: 5px 10px;
-                padding-left: 0px;
+                margin: 5px 10px;
+                margin-left: 0px;
                 font-size: $size-14;
             }
         }

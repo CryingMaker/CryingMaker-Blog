@@ -35,13 +35,11 @@
         </div>
 
         <div class="website-info">
-            <p><a href="javasrcipt:#">鄂ICP备xxxxxxx号</a></p>
-            <p><a href="javasrcipt:#">鄂ICP备xxxxxxx号</a></p>
+            <p><a href="void:(0)">鄂ICP备xxxxxxx号</a></p>
+            <p><a href="void:(0)">鄂ICP备xxxxxxx号</a></p>
         </div>
-
         <div class="top" ref="topDOM" @mousemove="gobacktop.setSpeed(1)" @mouseleave="gobacktop.setSpeed(.5)"
             @click="emit('goBackTop')"></div>
-
     </aside>
 </template>
 

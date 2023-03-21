@@ -29,7 +29,9 @@ body {
     overflow: hidden;
 }
 
-a {
+a,
+input,
+textarea {
     font-family: globalFont, HeLvetica, Arial, sans-serif;
     color: $gray-1;
 }

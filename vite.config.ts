@@ -9,6 +9,8 @@ import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  envDir: "env",
+  base: './',
   plugins: [
     vue(),
     AutoImport({
@@ -20,7 +22,6 @@ export default defineConfig({
       resolvers: [NaiveUiResolver()]
     }),
   ],
-  base: './',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

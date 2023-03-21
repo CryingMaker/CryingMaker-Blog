@@ -13,28 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getLink } from '../../api/link';
-import { linkData } from '../../types';
-import { useContentStore } from '../../store/index';
-import { useMessage } from 'naive-ui';
-const message = useMessage();
-const contentStore = useContentStore();
-
-let linkList = ref<Array<linkData>>([]);
-
-const getLinks = async () => {
-    try {
-        let res = await getLink(contentStore.pageNum, contentStore.pageSize);
-        linkList.value = linkList.value.concat(...res);
-    } catch (error) {
-        message.error(error as string)
-    }
-}
-
-
-onMounted(async () => {
-    await getLinks();
-})
+import { linkList } from '../../constant'
 
 
 </script>

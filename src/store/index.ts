@@ -30,22 +30,18 @@ export const useHeaderStore = defineStore('headerStore', {
 
 export const useContentStore = defineStore('contentStore', {
     state: () => {
-        //请求数量
-        let pageNum = 1;
-        let pageSize = 15;
+        let blogePageNum = 1;
+        let messagePageNum = 1;
+        let photoPageNum = 1;
 
         return {
-            pageNum,
-            pageSize
+            blogePageNum,
+            messagePageNum,
+            photoPageNum
         }
     },
     actions: {
-        incrementPageNum() {
-            this.pageNum++;
-        },
-        setPageNum(val: number) {
-            this.pageNum = val;
-        }
+
     },
     getters: {
 
