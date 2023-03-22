@@ -63,11 +63,11 @@ onMounted(() => {
             .image {
                 width: 100% !important;
                 height: 50% !important;
-                clip-path: polygon(0% 0%, 100% 0%, 100% 90%, 0 100%) !important;
+                clip-path: polygon(0% 0%, 100% 0%, 100% 85%, 0 100%) !important;
             }
 
             &:nth-child(odd) .image {
-                clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0 90%) !important;
+                clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0 85%) !important;
             }
 
             .content {
@@ -98,10 +98,10 @@ onMounted(() => {
     padding: 20px 10px;
 
     .carousel {
-        width: 98%;
-        height: 300px;
+        width: 100%;
+        height: 400px;
         margin: 0px auto;
-        border-radius: 10px;
+        border-radius: 15px;
 
         .carousel-img {
             width: 100%;
@@ -123,7 +123,7 @@ onMounted(() => {
 
     .item {
         background-color: $gray-1;
-        width: 90%;
+        width: 95%;
         height: 250px;
         border-radius: 10px;
         margin: 30px auto;

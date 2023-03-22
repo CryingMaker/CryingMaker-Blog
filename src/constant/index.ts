@@ -41,6 +41,7 @@ export const info = [
         desc: '唱 跳 RAP'
     }
 ]
+
 //个人标签
 export const tags = ['APEX', 'CSGO', '生化危机3', '生化危机2', '古墓丽影:暗影', '古墓丽影:崛起', '消逝的光芒'];
 

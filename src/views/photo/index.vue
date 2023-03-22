@@ -116,9 +116,16 @@ const handleUpload = () => {
 //上传图片
 const upload = async () => {
     let key = nanoid() + new Date().getTime();
-    let token = await getToken();
     let putExtra = {};
     let config = {};
+    let token: string = '';
+    try {
+        token = await getToken();
+    } catch (error) {
+        message.error('获取token失败!')
+        console.error(error);
+    }
+
     const observable = qiniu.upload(file.value.files[0], key, token, putExtra, config)
 
     const observer = {
@@ -127,6 +134,7 @@ const upload = async () => {
         error(err: any) {
             message.error('图片上传失败!');
             loading.value = false;
+            onModalClose();
             console.log(err);
         },
         async complete(res: any) {
@@ -134,6 +142,7 @@ const upload = async () => {
             loading.value = false;
             isShowViewer.value = false;
             showModal.value = false;
+            onModalClose();
         }
     }
     subscription = observable.subscribe(observer) // 上传开始

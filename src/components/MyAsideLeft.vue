@@ -24,19 +24,19 @@
             <div>
                 <p class="subtitle">文章</p>
                 <p class="total">
-                    <n-number-animation ref="blogNum" :show-separator="false" :from="0" :to="article" :active="true" />
+                    <n-number-animation :show-separator="false" :from="0" :to="article" :active="true" />
                 </p>
             </div>
             <div>
                 <p class="subtitle">留言</p>
                 <p class="total">
-                    <n-number-animation ref="messageNum" :show-separator="false" :from="0" :to="message" :active="true" />
+                    <n-number-animation :show-separator="false" :from="0" :to="message" :active="true" />
                 </p>
             </div>
             <div>
                 <p class="subtitle">照片</p>
                 <p class="total">
-                    <n-number-animation ref="photoNum" :show-separator="false" :from="0" :to="photo" :active="true" />
+                    <n-number-animation :show-separator="false" :from="0" :to="photo" :active="true" />
                 </p>
             </div>
         </div>
@@ -47,10 +47,6 @@
 import { getMessageCount } from '../api/message';
 import { getPhotoCount } from '../api/photo';
 import { color, info, tags } from '../constant'
-
-const articleNum = ref();
-const photoNum = ref();
-const messageNum = ref();
 
 const article = ref<number>(0);
 const photo = ref<number>(0);
